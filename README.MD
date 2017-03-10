@@ -108,6 +108,7 @@ The global config file which overwrites the default configuration is located her
 Please take a look at the supplied "automysqlbackup.conf" for information about the configuration options.
 
 Default configuration
+```
 CONFIG_configfile="/etc/automysqlbackup/automysqlbackup.conf"
 CONFIG_backup_dir='/var/backup/db'
 CONFIG_do_monthly="01"
@@ -134,6 +135,7 @@ CONFIG_mail_maxattsize=4000
 CONFIG_mail_address='root'
 CONFIG_encrypt='no'
 CONFIG_encrypt_password='password0123'
+```
 
 * automysqlbackup (the shell program) accepts one parameter, the filename of a configuration file. The entries in there will supersede all others.
 
