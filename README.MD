@@ -1,18 +1,16 @@
 # AutomysqlBackup
--------------------------
-## INDEX
--------------------------
-[Disclaimer](#Disclaimer)
-[Install](#Install)
-[Usage](#Usage)
-[Configuration Options](#ConfigurationOptions)
-[Encryption](#Encryption)
-[Backup rotation](#BackupRotation)
-[Restoring](#Restoring)
 
-(#Disclaimer)
+## INDEX
+[Disclaimer](#disclaimer)
+[Install](#install)
+[Usage](#usage)
+[Configuration Options](#configurationoptions)
+[Encryption](#encryption)
+[Backup rotation](#backuprotation)
+[Restoring](#restoring)
+
+
 ## DISCLAIMER
--------------------------
 I take no resposibility for any data loss or corruption when using this script.
 This script will not help in the event of a hard drive crash. If a copy of the
 backup has not been stored offline or on another PC. You should copy your backups
@@ -21,11 +19,8 @@ offline regularly for best protection.
 Happy backing up...
 
 
-
-.. INSTALL
--------------------------
-Extract the package into a directory. If you are reading this you have probably done
-this already.
+## INSTALL
+Extract the package into a directory. If you are reading this you have probably done this already.
 
 To install the Automysqlbackup the easy way.
 1. Run the install.sh script.
@@ -42,14 +37,12 @@ To install it manually (the hard way).
 
 
 
-.. USAGE
--------------------------
+## USAGE
 
 Automysqlbackup can be run a number of ways, you can choose which is best for you.
 
 1. Create a script as below called runmysqlbackup using the lines below:
-
-#~~~~ Copy From Below Here ~~~~
+```shell
 #!/bin/sh
 
 /usr/local/bin/automysqlbackup /etc/automysqlbackup/myserver.conf
@@ -57,30 +50,25 @@ Automysqlbackup can be run a number of ways, you can choose which is best for yo
 chown root.root /var/backup/db* -R
 find /var/backup/db* -type f -exec chmod 400 {} \;
 find /var/backup/db* -type d -exec chmod 700 {} \;
-
-#~~~~~ Copy To Above Here ~~~~
+```
 
 2. Save it to a suitable location or copy it to your /etc/cron.daily folder. 
-
 3. Make it executable, i.e. chmod +x /etc/cron.daily/runmysqlbackup.
 
-
 The backup can be run from the command line simply by running the following command.
-
-  automysqlbackup /etc/automysqlbackup/myserver.conf
-
+```shell
+automysqlbackup /etc/automysqlbackup/myserver.conf
+```
 If you don't supply an argument for automysqlbackup, the default configuration
-in the program automysqlbackup will be used unless a global file
-
-  CONFIG_configfile="/etc/automysqlbackup/automysqlbackup.conf"
-
-exists.
+in the program automysqlbackup will be used unless a global file exists.
+```shell
+CONFIG_configfile="/etc/automysqlbackup/automysqlbackup.conf"
+```
 
 You can just copy the supplied automysqlbackup.conf as many times as you want
 and use for separate configurations, i.e. for example different mysql servers.
 
-!!! NEW !!!
-----------
+### NEW
 As of version 3.0 we have added differential backups using the program diff. In an
 effort to make the reconstruction of the full archives more user friendly, we
 added new functionality to the script. Therefore, while preserving the old syntax,
@@ -92,43 +80,30 @@ Usage automysqlbackup options -cblh
 -l      List manifest entries.
 -h      Show this help.
 
-If you use these options, you have to specify everything according to them and can't
-mix the old syntax with the new one. Example:
+If you use these options, you have to specify everything according to them and can't mix the old syntax with the new one. Example:
 
 before (still valid!):
 
-  >> automysqlbackup "myconfig.conf"
+`automysqlbackup "myconfig.conf"`
 
 now:
-
-  >> automysqlbackup -c "myconfig.conf" -b
+`automysqlbackup -c "myconfig.conf" -b`
 
 which is equivalent to
+`automysqlbackup -bc "myconfig.conf"`
 
-  >> automysqlbackup -bc "myconfig.conf"
+or in English: The order of the options doesn't matter, however those options expecting arguments, have to be placed right before the argument (as seen above).
 
-or in English: The order of the options doesn't matter, however those options expecting
-arguments, have to be placed right before the argument (as seen above).
-
-The option '-l' (List manifest entries) finds all Manifest files in your configuration
-directory (you need to specify your optional config file - otherwise a fallback will be
-used: global config file -> program internal default options). It then filters from which
-databases these are and presents you with a list (you can select more than one!) of them.
-Once you have chosen, you will be given a list of Manifest files, from which you choose
-again and after that from which you choose differential files. When you have completed
-all your selections, a list of selected differential files will be shown. You may then
-choose what you want to be done with/to those files. At the moment the options are:
-- create full backup out of differential one
-- remove the differential backup and its Manifest entry.
+The option '-l' (List manifest entries) finds all Manifest files in your configuration directory (you need to specify your optional config file - otherwise a fallback will be used: global config file -> program internal default options). It then filters from which databases these are and presents you with a list (you can select more than one!) of them. Once you have chosen, you will be given a list of Manifest files, from which you choose again and after that from which you choose differential files. When you have completed
+all your selections, a list of selected differential files will be shown. You may then choose what you want to be done with/to those files. At the moment the options are:
+* create full backup out of differential one
+* remove the differential backup and its Manifest entry.
 
 
-.. CONFIGURATION OPTIONS
--------------------------
+## CONFIGURATION OPTIONS
+"automysqlbackup" program contains a default configuration that should not be changed:
 
-!! "automysqlbackup" program contains a default configuration that should not be changed:
-
-The global config file which overwrites the default configuration is located here
-"/etc/automysqlbackup/automysqlbackup.conf" by default.
+The global config file which overwrites the default configuration is located here`"/etc/automysqlbackup/automysqlbackup.conf"` by default.
 
 Please take a look at the supplied "automysqlbackup.conf" for information about the configuration options.
 
@@ -160,47 +135,39 @@ CONFIG_mail_address='root'
 CONFIG_encrypt='no'
 CONFIG_encrypt_password='password0123'
 
-!! automysqlbackup (the shell program) accepts one parameter, the filename of a configuration file. The entries in there will supersede all others.
+* automysqlbackup (the shell program) accepts one parameter, the filename of a configuration file. The entries in there will supersede all others.
 
 Please take a look at the supplied "automysqlbackup.conf" for information about the configuration options.
 
 
 
-.. ENCRYPTION
--------------------------
-
+## ENCRYPTION
 To decrypt run (replace bz2 with gz if using gzip):
-
+```
 openssl enc -aes-256-cbc -d -in encrypted_file_name(ex: *.enc.bz2) -out outputfilename.bz2 -pass pass:PASSWORD-USED-TO-ENCRYPT
+```
 
-
-
-.. BACKUP ROTATION
--------------------------
-
+## BACKUP ROTATION
 Daily Backups are rotated weekly.
+
 Weekly Backups are run on fridays, unless otherwise specified via CONFIG_do_weekly.
-Weekly Backups are rotated on a 5 week cycle, unless otherwise specified via CONFIG_rotation_weekly.
-Monthly Backups are run on the 1st of the month, unless otherwise specified via CONFIG_do_monthly.
-Monthly Backups are rotated on a 5 month cycle, unless otherwise specified via CONFIG_rotation_monthly.
+Weekly Backups are rotated on a 5 week cycle, unless otherwise specified via `CONFIG_rotation_weekly`.
+
+Monthly Backups are run on the 1st of the month, unless otherwise specified via `CONFIG_do_monthly`.
+Monthly Backups are rotated on a 5 month cycle, unless otherwise specified via `CONFIG_rotation_monthly`.
 
 Suggestion: It may be a good idea to copy monthly backups offline or to another server.
 
 
-
-.. RESTORING
--------------------------
-
+## RESTORING
 Firstly you will need to uncompress the backup file and decrypt it if encryption was used (see encryption section).
-
-eg.
+```
 gunzip file.gz (or bunzip2 file.bz2)
+```
 
 Next you will need to use the mysql client to restore the DB from the sql file.
-
-eg.
-  mysql --user=username --pass=password --host=dbserver database < /path/file.sql
+`mysql --user=username --pass=password --host=dbserver database < /path/file.sql`
 or
-  mysql --user=username --pass=password --host=dbserver -e "source /path/file.sql" database
+`mysql --user=username --pass=password --host=dbserver -e "source /path/file.sql" database`
 
 NOTE: Make sure you use "<" and not ">" in the above command because you are piping the file.sql to mysql and not the other way around.
